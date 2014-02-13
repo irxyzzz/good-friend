@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC 
+	"-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" 
+	"http://struts.apache.org/dtds/struts-2.1.dtd">
+
+
+<struts>
+    <constant name="struts.devMode" value="true" />
+    <package name="admin" extends="struts-default" namespace="/admin">
+
+        
+        <action name="login" class="com.goodfriend.admin.action.LoginAction" method="login">
+            <result name="index">/admin/index.jsp</result>
+            <result name="login_success" type="redirect">homePlacard</result>
+        </action>
+        
+        <action name="homePlacard" class="com.goodfriend.admin.action.homePlacard" method="list">        
+        	<result name="Placard_list">/admin/Admin_index.jsp</result>
+        </action>
+        
+        <action name="logout" class="com.goodfriend.admin.action.LoginAction" method="logout">
+			<result name="logout" type="redirect">/user/login.jsp</result>
+        </action>
+        
+        <action name="Admin_*" class="com.goodfriend.admin.action.ManagerAdminAction" method="{1}">
+       		<result name="add_success" type="redirect">Admin_list</result>
+       		<result name="Admin_list">/admin/Admin_list.jsp</result>
+       		<result name="del_success" type="redirect">Admin_list</result>
+       		<result name="update_input">/admin/Admin_updateInput.jsp</result> 
+       		<result name="view_admin_info">/admin/Admin_info.jsp</result>      		
+       		<result name="update_success" type="redirect">Admin_list</result>
+       		<result name="Admin_failed">/admin/Admin_failed.jsp</result>
+       </action>
+
+	    <action name="Placard_*" class="com.goodfriend.admin.action.ManagerPlacardAction" method="{1}">
+	   		<result name="Placard_list">/admin/Placard_list.jsp</result>
+       		<result name="add_success" type="redirect">Placard_list</result>
+     		<result name="failed">/admin/fault.jsp</result>
+     		<result name="view_placard_info">/admin/Placard_info.jsp</result>
+       		<result name="del_success" type="redirect">Placard_list</result>
+       		<result name="update_input">/admin/Placard_updateInput.jsp</result>  
+			<result name="update_success" type="redirect">Placard_list</result>
+       </action>
+    
+    <action name="User_*" class="com.goodfriend.admin.action.ManagerUserAction" method="{1}">
+	   		<result name="User_list">/admin/User_list.jsp</result>
+<!--       		<result name="add_success">/admin/Placard_add.jsp</result>-->
+     		<result name="failed">/admin/fault.jsp</result>
+     		<result name="view_user_info">/admin/User_info.jsp</result>  
+       		<result name="del_success" type="redirect">/admin/User_list</result>
+       		<result name="update_input">/admin/User_updateInput.jsp</result>  
+			<result name="update_success" type="redirect">/admin/User_list</result>
+       </action>
+        
+         <!-- <action name="searchUser" class="com.goodfriend.admin.action.SearchUserAction" method="searchUser">-->  
+         <!--   <result name="search">/admin/search.jsp</result>-->  
+         <!--   <result name="search_success">/admin/searchResult.jsp</result>-->  
+            <!-- <result name="delete">/admin/User_delete.jsp</result> -->
+       		<!-- <result name="update">/admin/User_updateInput.jsp</result> -->  
+       <!-- </action>-->  
+        
+        <action name="searchUser" class="com.goodfriend.admin.action.SearchUserAction" method="searchUser">
+            <result name="false">/admin/search.jsp</result>
+            <result name="userSuccess">/admin/userSearchResult.jsp</result>
+            <result name="adminSuccess">/admin/adminSearchResult.jsp</result>
+       		<result name="null">/admin/null_Search.jsp</result> 
+        </action>
+        
+        <action name="User1deleteUser" class="com.goodfriend.admin.action.SearchUserAction" method="deleteUser">
+        	<result name="delete_user">/admin/search.jsp</result>      		
+        </action>
+        <action name="Admin1deleteAdmin" class="com.goodfriend.admin.action.SearchUserAction" method="deleteAdmin">
+        	<result name="delete_admin">/admin/search.jsp</result>		
+        </action>
+        
+        <action name="User1userUpdateInput" class="com.goodfriend.admin.action.SearchUserAction" method="userUpdateInput">
+        	<result name="user_update_input">/admin/User_updateInput.jsp</result>      		
+       		<result name="user_update_success">/admin/User_update.jsp</result>
+        </action>
+        <action name="Admin1adminUpdateInput" class="com.goodfriend.admin.action.SearchUserAction" method="adminUpdateInput">
+        	<result name="admin_update_input">/admin/Admin_updateInput.jsp</result>      		
+       		<result name="admin_update_success">/admin/Admin_update.jsp</result>
+        </action>
+        
+    </package>
+
+    <!-- Add packages here -->
+
+</struts>

@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC 
+	"-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" 
+	"http://struts.apache.org/dtds/struts-2.1.dtd">
+
+<struts>
+	<constant name="struts.objectFactory" value="spring" />
+
+	<package name="user" namespace="/user" extends="struts-default">
+	
+		<!-- 配置用户权限检查 -->
+		<interceptors>
+			<interceptor name="authority" class="authorityIntceptor">
+				<param name="excludeMethods">login,register,validateName,random</param>
+			</interceptor>
+			<interceptor-stack name="myDefault">
+				<interceptor-ref name="defaultStack"></interceptor-ref>
+				<interceptor-ref name="authority"></interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+	
+		<global-results>
+			<result name="login">login.jsp</result>
+		</global-results>
+
+		<!-- Internationalization -->
+		<action name="index" class="">
+			<result>login.jsp</result>
+		</action>
+		<action name="select" class="languageSelectAction" method="select">
+			<interceptor-ref name="defaultStack"/>
+		</action>
+		<action name="to*" class="">
+			<interceptor-ref name="defaultStack"/>
+			<result>{1}.jsp</result>
+		</action>
+		<!-- 用户登录请求处理Action -->
+		<action name="login" class="loginAction" method="login">
+			<interceptor-ref name="defaultStack"/>
+			<result name="admin" type="redirect">/admin/homePlacard</result>
+			<result name="success" type="redirectAction">first.action</result>
+			<result name="login">login.jsp</result>
+		</action>
+		<action name="adminCheck" class="homeAction" method="adminCheck">
+			<result name="success">home.jsp</result>
+		</action>
+		<!-- 用户退出请求处理Action -->
+		<action name="logout" class="loginAction" method="logout">
+			<interceptor-ref name="defaultStack"/>
+			<result name="login" type="redirect">login.jsp</result>
+			<result>login.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 用户注册请求处理Action -->
+		<action name="register" class="registerAction" method="register">
+			<result name="success" type="redirectAction">first.action</result>
+			<result name="failed">register.jsp</result>
+		</action>
+		<!-- 修改信息 -->
+		<action name="modifyInfo" class="registerAction" method="modifyInfo">
+			<interceptor-ref name="myDefault"></interceptor-ref>
+			<result name="success">personal_info.jsp</result>
+			<result name="failed">personal_info.jsp</result>
+		</action>
+		<!-- 用户注册用户名是否存在验证AJAX请求处理Action -->
+		<action name="isNameExist" class="registerAction" method="validateName">
+			<result name="success" type="stream"></result>
+		</action>
+		<!-- 文件上传请求的Action -->
+		<action name="fileUpload" class="fileUploadAction" method="upload">
+			<param name="uploadDir">/pictures/default</param>
+			<result name="success">index.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 用户头像编辑请求Action -->
+		<action name="editPhoto" class="photoEditAction" method="editPhoto">
+			<result name="edit">photo_edit.jsp</result>
+		</action>
+		<!-- Random验证码 -->
+		<action name="random" class="randomNumberAction" method="random">
+			<result name="success" type="stream">
+				<param name="contentType">image/jpeg</param>
+				<param name="inputName">inputStream</param>
+			</result>
+		</action>
+		<!-- 异步更新用户状态 -->
+		<action name="changeStmt" class="statementAction" method="updateStatement">
+			<result name="success" type="stream"></result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 异步获得用户最新的一条状态信息 -->
+		<action name="getNewStmt" class="statementAction" method="getLatestStatement">
+			<result name="success" type="stream"></result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 获得用户好友新鲜事 -->
+		<action name="first" class="latestMsgAction" method="getLatestMsg">
+			<result name="success">index.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 用户回复异步处理 -->
+		<action name="replyAjax" class="replyAction" method="replyAjax">
+			<result name="success" type="stream"></result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 删除用户的回复异步处理 -->
+		<action name="deleteReply" class="replyAction" method="deleteReply">
+			<result name="success" type="stream"></result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+
+		<!-- 访问个人主页的请求处理 -->
+		<action name="home" class="homeAction" method="home">
+			<result name="success">home.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 异步获得用户的最近的几条留言 -->
+		<action name="getGossipReplies" class="gossipAction" method="getGossipReplies">
+			<result name="success" type="stream"></result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 异步添加用户留言 -->
+		<action name="addGossip" class="gossipAction" method="addGossip">
+			<result name="success" type="stream"></result>
+			<result name="getReplies" type="stream"></result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 异步删除用户留言 -->
+		<action name="delGossip" class="gossipAction" method="delGossip">
+			<result name="success" type="stream"></result>
+		</action>
+		<!-- 异步删除用户留言的回复 -->
+		<action name="delGossipReply" class="gossipAction" method="delGossipReply">
+			<result name="success" type="stream"></result>
+		</action>
+		<!-- 获得用户所有的留言 -->
+		<action name="allGossip" class="gossipAction" method="getAllGossip">
+			<result name="success">gossip.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 获得分页留言 -->
+		<action name="getGossipByPage" class="gossipAction" method="getGossipByPage">
+			<result name="success">gossip.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 同步添加用户的留言 -->
+		<action name="addGossipCommon" class="gossipAction" method="addGossipCommon">
+			<result name="success">gossip.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 同步删除用户留言 -->
+		<action name="delGossipCommon" class="gossipAction" method="delGossipCommon">
+			<result name="success">gossip.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<!-- 同步删除用户留言中回复 -->
+		<action name="delGossipReplyCommon" class="gossipAction" method="delGossipReplyCommon">
+			<result name="success">gossip.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		<action name="deleteMail" class="mailAction" method="deleteMail">
+			<interceptor-ref name="myDefault"></interceptor-ref>
+			<result name="success" type="stream"></result>
+		</action>
+		
+		
+		
+
+		<!-- 发布blog -->
+		<action name="publishBlog" class="blogAction" method="publish">
+			<result name="success" type="redirect">showAllBlogs</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+
+		<!-- 查看某一页的blog -->
+		<action name="showAllBlogs" class="blogAction" method="showBlogs">
+			<result name="success" >all_blogs.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+
+		<!-- 查看某一篇自己的blog -->
+		<action name="showBlog" class="blogAction" method="showBlog">
+			<result name="editBlog">modify_blog.jsp</result>
+			<result name="showBlog">blog.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		
+		<action name="updateBlog" class="blogAction" method="updateBlog">
+			<result name="success" type="redirect">showAllBlogs</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		
+		<action name="deleteBlog" class="blogAction" method="deleteBlog">
+			<result name="success" type="redirect">showAllBlogs</result>
+		</action>
+		
+		<action name="addBlogReply" class="blogAction" method="addBlogReply">
+			<result name="success" type="stream"></result>
+		</action>
+		
+		<action name="personalInfo" class="personalInfoAction" method="showPersonalInfo">
+			<result name="success" type="redirect">personal_info.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		
+		<action name="showFriends" class="friendAction" method="showFriends">
+			<result name="success">friend.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+
+		
+		<action name="searchFriends" class="friendAction" method="searchFriends">
+			<result name="success">friend.jsp</result>
+			<result name="searchUser" type="redirect">
+			searchUser?userName=%{userName}</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		
+		<action name="searchUser" class="userAction" method="searchUser">
+			<result name="success">search_user.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		
+		<action name="deleteFriend" class="friendAction" method="deleteFriend">
+			<result name="success" type="redirectAction">showFriends</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		
+		<action name="addFriend" class="friendAction" method="addFriend">
+			<!-- 
+			<result name="success" type="redirectAction">showFriends</result>
+			 -->
+			<result name="success" type="stream"></result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+		
+		<action name="addFriendToRequestList" class="friendAction" method="addFriendToRequestList">
+			<interceptor-ref name="myDefault"></interceptor-ref>
+			<result name="success" type="redirectAction">showFriends</result>
+		</action>
+		
+		<action name="refuseFriend" class="friendAction" method="refuseFriend">
+			<interceptor-ref name="myDefault"></interceptor-ref>
+			<result name="success" type="stream"></result>
+			<!-- 
+			<result name="success" type="redirectAction">showFriends</result>
+			 -->
+		</action>
+		
+		<action name="getFriendsByPage" class="friendAction" method="getFriendsByPage">
+			<result name="success">friend.jsp</result>
+			<interceptor-ref name="myDefault"></interceptor-ref>
+		</action>
+	</package>
+
+	<include file="struts_admin.xml" />
+	<!-- Add packages here -->
+
+</struts>
